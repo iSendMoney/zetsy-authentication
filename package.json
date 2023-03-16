@@ -9,5 +9,8 @@
     "helmet": "^6.0.1",
     "mongoose": "^7.0.2",
     "morgan": "^1.10.0"
+  },
+  "scripts": {
+    "start":"node server.js"
   }
 }
