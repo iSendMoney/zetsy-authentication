@@ -1,36 +1,25 @@
-const Joi = require("joi");
-
 // @note it contains lot's of data but factorize it
 module.exports = {
-  userRegistrationValidation: (req, res, next) => {
-    const schema = Joi.object({
-      username: Joi.string().alphanum().min(3).max(30).required(),
-      password: Joi.string().pattern(new RegExp("^[a-zA-Z0-9]{3,30}$")),
-      repeat_password: Joi.ref("password"),
-      access_token: [Joi.string(), Joi.number()],
-      birth_year: Joi.number().integer().min(1900).max(2013),
-      email: Joi.string().email({
-        minDomainSegments: 2,
-        tlds: { allow: ["com", "net"] },
-      }),
-    })
-      .with("username", "password")
-      .xor("password", "access_token")
-      .with("password", "repeat_password");
+  authenticationInputValidation: (req, res, next) => {
+    const { email, password } = req.body;
 
-    // Validate input
-    const { error, value } = schema.validate({
-      username: "JohnDoe",
-      password: "password123",
-      repeat_password: "password123",
-      birth_year: 1990,
-      email: "john@doe.com",
-    });
-
-    if (error) {
-      console.log(error.details);
-    } else {
-      console.log(value);
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    const isValidEmail = emailRegex.test(email);
+    if (!isValidEmail) {
+      return res.status(400).json({
+        msg: "Invalid email format!"
+      });
     }
+
+    const passwordRegex =
+      /^(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
+    const isValidPassword = passwordRegex.test(password);
+    if (!isValidPassword) {
+      return res.status(400).json({
+        msg: "Invalid password format!"
+      });
+    }
+
+    next();
   },
 };

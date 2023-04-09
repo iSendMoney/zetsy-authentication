@@ -33,7 +33,7 @@ module.exports = {
 
     await new RefreshToken({ token: refreshToken }).save();
 
-    res.json({ accessToken, refreshToken });
+    res.json({ accessToken, refreshToken, user });
   },
   logoutUser: async (req, res) => {
     const refreshToken = req.body.token;

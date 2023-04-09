@@ -6,14 +6,21 @@ const express = require("express"),
     logoutUser,
     resetPassword,
   } = require("../controllers/auth");
+const {
+  authenticationInputValidation,
+} = require("../middlewares/inputValidation");
 
 const AuthenticationRouter = express.Router();
 
-AuthenticationRouter.post("/login", loginUser);
+AuthenticationRouter.post("/login", authenticationInputValidation, loginUser);
 
 AuthenticationRouter.post("/logout", logoutUser);
 
-AuthenticationRouter.post("/register", registerUser);
+AuthenticationRouter.post(
+  "/register",
+  authenticationInputValidation,
+  registerUser
+);
 
 // POST /api/forgot-password
 AuthenticationRouter.post("/forgot-password", forgotPassword);
