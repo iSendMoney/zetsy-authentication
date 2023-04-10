@@ -32,7 +32,7 @@ module.exports = {
     );
 
     await new RefreshToken({ token: refreshToken }).save();
-
+    
     res.json({ accessToken, refreshToken, user });
   },
   logoutUser: async (req, res) => {
@@ -43,7 +43,8 @@ module.exports = {
   registerUser: async (req, res) => {
     try {
       // Get the user input from the request body
-      const { email, password } = req.body;
+      const { email, password, picture } = req.body;
+      const {social} = req.query;
 
       // Check if the user already exists in the database
       const existingUser = await User.findOne({ email });
@@ -53,57 +54,73 @@ module.exports = {
 
       // Hash the user's password before storing it in the database
       const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
+      const hashedPassword = await bcrypt.hash(password || "password", salt);
 
       // Create a new user object and save it to the database
-      const newUser = new User({ email, password: hashedPassword });
+      const newUser = new User({ email, password: hashedPassword, picture });
       const savedUser = await newUser.save();
+      if(social){
 
-      res.status(201).json(savedUser);
-
-      // Return the newly created user object to the client
-      const verificationToken = jwt.sign(
-        { userId: savedUser._id },
-        process.env.JWT_SECRET,
-        {
-          expiresIn: "1d",
-        }
-      );
-
-      try {
-        const transporter = nodemailer.createTransport({
-          service: "gmail",
-          auth: {
-            user: process.env.NODEMAILER_EMAIL,
-            pass: process.env.NODEMAILER_PASSWORD,
-          },
+        const accessToken = jwt.sign({ userId: savedUser._id }, process.env.JWT_SECRET, {
+          expiresIn: "15m",
         });
+    
+        const refreshToken = jwt.sign(
+          { userId: savedUser._id },
+          process.env.JWT_REFRESH_SECRET,
+          { expiresIn: "7d" }
+        );
+    
+        await new RefreshToken({ token: refreshToken }).save();
+        res.status(201).json({savedUser, accessToken, refreshToken})
+      }else{
 
-        const mailOptions = {
-          from: "no-reply@zetsy.store", // replace with your email
-          to: email,
-          subject: "Verify your email",
-          html: `<html>
-          <head>
-              <style>
-                  /* Add your custom styles here */
-              </style>
-          </head>
-          <body>
-              <div style="background-color: #f8f8f8; padding: 20px;">
-                  <h1>Welcome to Zetsy!</h1>
-                  <p>Thank you for registering with us. Please click the link below to verify your account:</p>
-                  <a href="https://zetsy-auth.herokuapp.com/api/v1/auth/verify-email?token=${verificationToken}" style="background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">Verify Account</a>
-                  <p>If you did not sign up for this account, please ignore this email.</p>
-              </div>
-          </body>
-      </html>`,
-        };
-
-        await transporter.sendMail(mailOptions);
-        console.log(`Verification email sent to ${email}`);
-      } catch (error) {
-        console.error(`Error sending verification email to ${email}: ${error}`);
+        res.status(201).json(savedUser);
+  
+        // Return the newly created user object to the client
+        const verificationToken = jwt.sign(
+          { userId: savedUser._id },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: "1d",
+          }
+        );
+  
+        try {
+          const transporter = nodemailer.createTransport({
+            service: "gmail",
+            auth: {
+              user: process.env.NODEMAILER_EMAIL,
+              pass: process.env.NODEMAILER_PASSWORD,
+            },
+          });
+  
+          const mailOptions = {
+            from: "no-reply@zetsy.store", // replace with your email
+            to: email,
+            subject: "Verify your email",
+            html: `<html>
+            <head>
+                <style>
+                    /* Add your custom styles here */
+                </style>
+            </head>
+            <body>
+                <div style="background-color: #f8f8f8; padding: 20px;">
+                    <h1>Welcome to Zetsy!</h1>
+                    <p>Thank you for registering with us. Please click the link below to verify your account:</p>
+                    <a href="https://zetsy-auth.herokuapp.com/api/v1/auth/verify-email?token=${verificationToken}" style="background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">Verify Account</a>
+                    <p>If you did not sign up for this account, please ignore this email.</p>
+                </div>
+            </body>
+        </html>`,
+          };
+  
+          await transporter.sendMail(mailOptions);
+          console.log(`Verification email sent to ${email}`);
+        } catch (error) {
+          console.error(`Error sending verification email to ${email}: ${error}`);
+        }
       }
     } catch (err) {
       console.error(err);
