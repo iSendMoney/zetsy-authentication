@@ -9,7 +9,7 @@ const hpp = require("hpp");
 // const csurf = require("csurf");
 const { default: mongoose } = require("mongoose");
 const AuthenticationRouter = require("./routes/auth");
-
+require('dotenv').config()
 const limiter = rateLimit({
   // @note need to determine how many request per minute might be there in our platform and thus set the limit
   windowMs: 15 * 60 * 1000, // 15 minutes
