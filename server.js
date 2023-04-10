@@ -1,6 +1,9 @@
 const app  = require('./app');
 const rateLimit = require("express-rate-limit");
 const { testRouter } = require('./routes/testRoutes');
+const { onboardRoutes } = require('./routes/onboardRoutes');
+const { authRoutes } = require('./routes/authRoutes');
+
 
 
 /**
@@ -21,6 +24,9 @@ const apiLimiter = rateLimit({
 app.use("/api",apiLimiter);
 
 app.use("/api/test", testRouter);
+app.use("/api/onboard", onboardRoutes);
+app.use("/api/auth", authRoutes);
+
 
 app
   .get("/", (req, res) => {
