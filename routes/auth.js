@@ -29,6 +29,6 @@ AuthenticationRouter.post("/forgot-password", forgotPassword);
 // POST /api/reset-password
 AuthenticationRouter.post("/reset-password", resetPassword);
 
-AuthenticationRouter.get("verify-email", verifyUser);
+AuthenticationRouter.get("/verify-email", verifyUser);
 
 module.exports = AuthenticationRouter;

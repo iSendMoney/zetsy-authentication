@@ -66,7 +66,7 @@ module.exports = {
         { userId: savedUser._id },
         process.env.JWT_SECRET,
         {
-          expiresIn: "60m",
+          expiresIn: "1d",
         }
       );
 
@@ -75,7 +75,7 @@ module.exports = {
           service: "gmail",
           auth: {
             user: process.env.NODEMAILER_EMAIL,
-            pass: process.env.NODEMAILER_PASSWORD
+            pass: process.env.NODEMAILER_PASSWORD,
           },
         });
 
@@ -93,7 +93,7 @@ module.exports = {
               <div style="background-color: #f8f8f8; padding: 20px;">
                   <h1>Welcome to Zetsy!</h1>
                   <p>Thank you for registering with us. Please click the link below to verify your account:</p>
-                  <a href="http://localhost:3000/verify/?token=${verificationToken}" style="background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">Verify Account</a>
+                  <a href="http://localhost:3000/api/v1/auth/verify-email?token=${verificationToken}" style="background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">Verify Account</a>
                   <p>If you did not sign up for this account, please ignore this email.</p>
               </div>
           </body>
@@ -188,15 +188,14 @@ module.exports = {
   },
   verifyUser: async (req, res) => {
     try {
-      const { token } = req.params;
+      const { token } = req.query;
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       const user = await User.findById(decoded.userId);
       if (!user) {
         return res.status(404).json({ message: "User not found" });
       }
-      user.isVerified = true;
-      await user.save();
-      res.json({ message: "User verified successfully" });
+      await User.findByIdAndUpdate(decoded.userId, { verified: true });
+      res.status(200).send("User verified successfully!");
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Server error" });
