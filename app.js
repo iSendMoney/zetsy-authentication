@@ -1,58 +1,50 @@
+const { authenticateToken } = require("./middlewares/protected");
 const express = require("express");
-const app = express();
 const morgan = require("morgan");
-const { default: helmet } = require("helmet");
-const compression = require("compression");
-const { dbConfig } = require("./utils/db");
-require("dotenv").config();
-const cluster = require("node:cluster");
-const numCPUs = require("node:os");
 const cors = require("cors");
-const process = require("node:process");
-const PORT = process.env.PORT || 4000;
+const app = express();
+const rateLimit = require("express-rate-limit");
+const helmet = require("helmet");
+const hpp = require("hpp");
+// const csurf = require("csurf");
+const { default: mongoose } = require("mongoose");
+const AuthenticationRouter = require("./routes/auth");
 
+const limiter = rateLimit({
+  // @note need to determine how many request per minute might be there in our platform and thus set the limit
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: "Too many requests from this IP, please try again later",
+});
 
 app
-  .use(morgan("dev"))
   .use(express.json())
-  .use(express.urlencoded({ extended: true }))
+  .use(morgan("dev"))
+  .use(cors())
+  .use(limiter)
   .use(helmet())
-  .use(compression());
+  .use(hpp());
+// .use(csurf());
 
-/**
- * @dev configuration utils
- * 1. Database Configuration
- */
-dbConfig();
-
-
-  
-  
-  app.listen(PORT, () => {
-    console.log(`👾 : Server listening on ${PORT}!`);
+mongoose
+  .connect(process.env.MONGO_URI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Connected to MongoDB");
+  })
+  .catch((err) => {
+    console.log(err);
   });
-  
-  const validDomains = ["https://www.zetsy.store", "https://zetsy.store"];
-  
-  app.use(
-    cors({
-      origin: process.env.NODE_ENV === "DEVELOPMENT" ? "*" : validDomains,
-    })
-  )
-  
-  if (cluster.isPrimary) {
-    console.log(`Primary ${process.pid} is running`);
-  
-    // Fork workers.
-    for (let i = 0; i < numCPUs; i++) {
-      cluster.fork();
-    }
-  
-    cluster.on("exit", (worker, code, signal) => {
-      console.log(`worker ${worker.process.pid} died`);
-    });
-  } else {
-    console.log(`Worker ${process.pid} started`);
-  }
+
+app
+  .use("/protected", authenticateToken, (req, res) => {
+    res.send("This route is protected!");
+  })
+  .use("/api/v1/auth", AuthenticationRouter)
+  .use("*", (req, res) => {
+    res.status(404).send("Not Found");
+  });
 
 module.exports = app;
