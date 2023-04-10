@@ -59,8 +59,52 @@ module.exports = {
       const newUser = new User({ email, password: hashedPassword });
       const savedUser = await newUser.save();
 
-      // Return the newly created user object to the client
       res.status(201).json(savedUser);
+
+      // Return the newly created user object to the client
+      const verificationToken = jwt.sign(
+        { userId: savedUser._id },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "60m",
+        }
+      );
+
+      try {
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: "laxman.rai.07.26@gmail.com", // replace with your email
+            pass: "efkreblisqixbjyh", // replace with your password
+          },
+        });
+
+        const mailOptions = {
+          from: "no-reply@zetsy.store", // replace with your email
+          to: email,
+          subject: "Verify your email",
+          html: `<html>
+          <head>
+              <style>
+                  /* Add your custom styles here */
+              </style>
+          </head>
+          <body>
+              <div style="background-color: #f8f8f8; padding: 20px;">
+                  <h1>Welcome to Zetsy!</h1>
+                  <p>Thank you for registering with us. Please click the link below to verify your account:</p>
+                  <a href="http://localhost:3000/verify/?token=${verificationToken}" style="background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">Verify Account</a>
+                  <p>If you did not sign up for this account, please ignore this email.</p>
+              </div>
+          </body>
+      </html>`,
+        };
+
+        await transporter.sendMail(mailOptions);
+        console.log(`Verification email sent to ${email}`);
+      } catch (error) {
+        console.error(`Error sending verification email to ${email}: ${error}`);
+      }
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Server error" });
@@ -137,6 +181,22 @@ module.exports = {
       await user.save();
 
       res.json({ message: "Password reset successfully" });
+    } catch (err) {
+      console.error(err);
+      res.status(500).json({ message: "Server error" });
+    }
+  },
+  verifyUser: async (req, res) => {
+    try {
+      const { token } = req.params;
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const user = await User.findById(decoded.userId);
+      if (!user) {
+        return res.status(404).json({ message: "User not found" });
+      }
+      user.isVerified = true;
+      await user.save();
+      res.json({ message: "User verified successfully" });
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Server error" });
