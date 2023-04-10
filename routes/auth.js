@@ -5,6 +5,7 @@ const express = require("express"),
     forgotPassword,
     logoutUser,
     resetPassword,
+    verifyUser,
   } = require("../controllers/auth");
 const {
   authenticationInputValidation,
@@ -27,5 +28,7 @@ AuthenticationRouter.post("/forgot-password", forgotPassword);
 
 // POST /api/reset-password
 AuthenticationRouter.post("/reset-password", resetPassword);
+
+AuthenticationRouter.get("verify-email", verifyUser);
 
 module.exports = AuthenticationRouter;
