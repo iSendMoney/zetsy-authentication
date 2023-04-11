@@ -8,7 +8,7 @@ module.exports = {
     const isValidEmail = emailRegex.test(email);
     if (!isValidEmail) {
       return res.status(400).json({
-        msg: "Invalid email format!"
+        message: "Invalid email"
       });
     }
     // do not validate password if it is social authentication
@@ -18,7 +18,7 @@ module.exports = {
       const isValidPassword = passwordRegex.test(password);
       if (!isValidPassword) {
         return res.status(400).json({
-          msg: "Invalid password format!"
+          message: "Invalid password"
         });
       }
     }
