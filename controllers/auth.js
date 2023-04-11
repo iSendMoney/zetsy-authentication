@@ -10,6 +10,7 @@ module.exports = {
     const { email, password } = req.body;
     const {social} = req.query;
     const user = await User.findOne({ email });
+   
     if (!user) {
       return res
         .status(401)

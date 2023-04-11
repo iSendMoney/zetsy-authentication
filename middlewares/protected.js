@@ -1,3 +1,4 @@
+const jwt = require("jsonwebtoken");
 module.exports = {
   authenticateToken: (req, res, next) => {
     const authHeader = req.headers["authorization"];
@@ -7,7 +8,7 @@ module.exports = {
       return res.status(401).send("Unauthorized");
     }
 
-    jwt.verify(token, "secret", (err, user) => {
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
       if (err) {
         return res.status(403).send("Forbidden");
       }
