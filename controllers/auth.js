@@ -8,17 +8,18 @@ const User = require("../models/user"),
 module.exports = {
   loginUser: async (req, res) => {
     const { email, password } = req.body;
-
+    const {social} = req.query;
     const user = await User.findOne({ email });
     if (!user) {
       return res
         .status(401)
         .json({ message: "Email does not exists in the DB." });
     }
-
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(401).json({ message: "Incorrect email or password." });
+    if(!social){
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ message: "Incorrect email or password." });
+      }
     }
 
     const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
