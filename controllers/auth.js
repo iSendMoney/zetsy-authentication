@@ -8,18 +8,20 @@ const User = require("../models/user"),
 module.exports = {
   loginUser: async (req, res) => {
     const { email, password } = req.body;
-    const {social} = req.query;
+    const { social } = req.query;
     const user = await User.findOne({ email });
-   
+
     if (!user) {
       return res
         .status(401)
         .json({ message: "Email does not exists in the DB." });
     }
-    if(!social){
+    if (!social) {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
-        return res.status(401).json({ message: "Incorrect email or password." });
+        return res
+          .status(401)
+          .json({ message: "Incorrect email or password." });
       }
     }
 
@@ -34,7 +36,7 @@ module.exports = {
     );
 
     await new RefreshToken({ token: refreshToken }).save();
-    
+
     res.json({ accessToken, refreshToken, user });
   },
   logoutUser: async (req, res) => {
@@ -46,7 +48,7 @@ module.exports = {
     try {
       // Get the user input from the request body
       const { email, password, picture } = req.body;
-      const {social} = req.query;
+      const { social } = req.query;
 
       // Check if the user already exists in the database
       const existingUser = await User.findOne({ email });
@@ -61,24 +63,26 @@ module.exports = {
       // Create a new user object and save it to the database
       const newUser = new User({ email, password: hashedPassword, picture });
       const savedUser = await newUser.save();
-      if(social){
+      if (social) {
+        const accessToken = jwt.sign(
+          { userId: savedUser._id },
+          process.env.JWT_SECRET,
+          {
+            expiresIn: "15m",
+          }
+        );
 
-        const accessToken = jwt.sign({ userId: savedUser._id }, process.env.JWT_SECRET, {
-          expiresIn: "15m",
-        });
-    
         const refreshToken = jwt.sign(
           { userId: savedUser._id },
           process.env.JWT_REFRESH_SECRET,
           { expiresIn: "7d" }
         );
-    
-        await new RefreshToken({ token: refreshToken }).save();
-        res.status(201).json({savedUser, accessToken, refreshToken})
-      }else{
 
+        await new RefreshToken({ token: refreshToken }).save();
+        res.status(201).json({ savedUser, accessToken, refreshToken });
+      } else {
         res.status(201).json(savedUser);
-  
+
         // Return the newly created user object to the client
         const verificationToken = jwt.sign(
           { userId: savedUser._id },
@@ -87,7 +91,7 @@ module.exports = {
             expiresIn: "1d",
           }
         );
-  
+
         try {
           const transporter = nodemailer.createTransport({
             service: "gmail",
@@ -96,7 +100,7 @@ module.exports = {
               pass: process.env.NODEMAILER_PASSWORD,
             },
           });
-  
+
           const mailOptions = {
             from: "no-reply@zetsy.store", // replace with your email
             to: email,
@@ -117,11 +121,13 @@ module.exports = {
             </body>
         </html>`,
           };
-  
+
           await transporter.sendMail(mailOptions);
           console.log(`Verification email sent to ${email}`);
         } catch (error) {
-          console.error(`Error sending verification email to ${email}: ${error}`);
+          console.error(
+            `Error sending verification email to ${email}: ${error}`
+          );
         }
       }
     } catch (err) {
