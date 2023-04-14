@@ -80,7 +80,7 @@ module.exports = {
         });
 
         const mailOptions = {
-          from: "no-reply@zetsy.store", // replace with your email
+          from: "Zetsy Store <no-reply@zetsy.store>",
           to: email,
           subject: "Verify your email",
           html: `<html>
@@ -127,20 +127,16 @@ module.exports = {
       user.passwordResetExpires = Date.now() + 3600000; // Token expires in 1 hour
       await user.save();
 
-      // Send a password reset email to the user
       const transporter = nodemailer.createTransport({
-        // Replace with your SMTP server configuration
-        host: "smtp.example.com",
-        port: 587,
-        secure: false,
+        service: "gmail",
         auth: {
-          user: "your-smtp-username",
-          pass: "your-smtp-password",
+          user: process.env.NODEMAILER_EMAIL,
+          pass: process.env.NODEMAILER_PASSWORD,
         },
       });
 
       const mailOptions = {
-        from: "Your Name <your-email@example.com>",
+        from: "Zetsy Store <no-reply@zetsy.store>",
         to: email,
         subject: "Password Reset Request",
         html: `
