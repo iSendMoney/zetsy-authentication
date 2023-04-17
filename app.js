@@ -10,6 +10,7 @@ const hpp = require("hpp");
 const { default: mongoose } = require("mongoose");
 const AuthenticationRouter = require("./routes/auth");
 const ProductRouter = require("./routes/product");
+const StoreRouter = require("./routes/store");
 require('dotenv').config()
 const limiter = rateLimit({
   // @note need to determine how many request per minute might be there in our platform and thus set the limit
@@ -45,6 +46,7 @@ app
   })
   .use("/api/v1/auth", AuthenticationRouter)
   .use("/api/v1/product", ProductRouter)
+  .use("/api/v1/store", StoreRouter)
   .use("*", (req, res) => {
     res.status(404).send("Not Found");
   });
