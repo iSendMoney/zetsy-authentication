@@ -3,6 +3,7 @@ Schema = mongoose.Schema;
 
 const storeSchema = new mongoose.Schema({
     name: { type: String, unique: true, required: true },
+    subdomain: {type: String, unique: true, required:true},
     no_of_emp: {type: String, required:true},
     estimated_revenue: {type: String, required: true},
     category: { type: String, required:true}, 
