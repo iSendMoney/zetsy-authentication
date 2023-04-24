@@ -25,8 +25,9 @@ module.exports = {
       }
     }
 
+    // set expiration time for one days
     const accessToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, {
-      expiresIn: "15m",
+      expiresIn: "1d",
     });
 
     const refreshToken = jwt.sign(
@@ -34,6 +35,10 @@ module.exports = {
       process.env.JWT_REFRESH_SECRET,
       { expiresIn: "7d" }
     );
+
+    /**
+     * @dev why refresh token are saved seprately? 
+     */
 
     await new RefreshToken({ token: refreshToken }).save();
 
@@ -160,13 +165,15 @@ module.exports = {
         },
       });
 
+      // set client URL
+      const clientUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://app.zetsy.store";
       const mailOptions = {
         from: "Zetsy Store <no-reply@zetsy.store>",
         to: email,
         subject: "Password Reset Request",
         html: `
             <p>You have requested a password reset. Please click on the following link to reset your password:</p>
-            <a href="http://localhost:3000/reset-password/${token}">http://localhost:3000/reset-password/${token}</a>
+            <a href="${clientUrl}/reset-password/${token}">${clientUrl}/reset-password/${token}</a>
             <p>If you did not request this reset, please ignore this email and your password will remain unchanged.</p>
           `,
       };
@@ -200,7 +207,6 @@ module.exports = {
       user.passwordResetToken = undefined;
       user.passwordResetExpires = undefined;
       await user.save();
-
       res.json({ message: "Password reset successfully" });
     } catch (err) {
       console.error(err);
