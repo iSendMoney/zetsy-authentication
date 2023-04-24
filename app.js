@@ -22,7 +22,11 @@ const limiter = rateLimit({
 app
   .use(express.json())
   .use(morgan("dev"))
-  .use(cors())
+  .use(cors({
+    origin:"*",
+    headers: "content-type",
+    exposeHeaders: "access-control-allow-origin,access-control-allow-methods,access-control-allow-headers"
+  }))
   .use(limiter)
   .use(helmet())
   .use(hpp());
