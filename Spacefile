@@ -5,3 +5,4 @@ micros:
     src: ./
     engine: nodejs16
     primary: true
+    dev: nodemon index.js
