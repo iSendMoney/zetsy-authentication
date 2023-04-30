@@ -1,8 +1,0 @@
-# Spacefile Docs: https://go.deta.dev/docs/spacefile/v0
-v: 0
-micros:
-  - name: zetsy-node
-    src: ./
-    engine: nodejs16
-    primary: true
-    dev: nodemon index.js
