@@ -34,7 +34,7 @@ module.exports = {
     getStoreById: async(req,res)=>{
         try {
             const {store} = req.params;
-            const _store = await Store.findOne({_id: store});
+            const _store = await Store.findOne({subdomain: store});
             res.json({store: _store});
         } catch (error) {
             res.status(400).send(error)
