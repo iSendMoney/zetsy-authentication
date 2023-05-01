@@ -29,6 +29,18 @@ module.exports = {
         const {userId} = req.user;
         const store = await Store.findOne({owner: userId});
         res.json({store});
+    },
+
+    getStoreById: async(req,res)=>{
+        try {
+            const {store} = req.params;
+            const _store = await Store.findOne({_id: store});
+            res.json({store: _store});
+        } catch (error) {
+            res.status(400).send(error)
+        }
     }
+
+
 
 }
