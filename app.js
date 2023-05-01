@@ -23,9 +23,7 @@ app
   .use(express.json())
   .use(morgan("dev"))
   .use(cors({
-    origin:"*",
-    headers: "content-type",
-    exposeHeaders: "access-control-allow-origin,access-control-allow-methods,access-control-allow-headers"
+    origin:"*"
   }))
   .use(limiter)
   .use(helmet())
