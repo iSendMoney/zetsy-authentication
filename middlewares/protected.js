@@ -5,8 +5,7 @@ module.exports = {
     let token;
     if(authHeader && authHeader.startsWith("Bearer")){
       token = authHeader.split(" ")[1];
-    }
-    if(authHeader){
+    }else{
       token = authHeader.split(" ")[0];
     }
     console.log(token)
