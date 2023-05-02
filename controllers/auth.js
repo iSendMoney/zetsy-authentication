@@ -16,6 +16,7 @@ module.exports = {
         .status(401)
         .json({ message: "Email does not exists in the DB." });
     }
+    console.log(user)
     if (!social) {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) {
@@ -37,7 +38,7 @@ module.exports = {
     );
 
     /**
-     * @dev why refresh token are saved seprately? 
+     * @dev why refresh token are saved seprately?
      */
 
     await new RefreshToken({ token: refreshToken }).save();
@@ -63,7 +64,10 @@ module.exports = {
 
       // Hash the user's password before storing it in the database
       const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password || "Password@2023", salt);
+      const hashedPassword = await bcrypt.hash(
+        password || "Password@2023",
+        salt
+      );
 
       // Create a new user object and save it to the database
       const newUser = new User({ email, password: hashedPassword, picture });
@@ -166,7 +170,10 @@ module.exports = {
       });
 
       // set client URL
-      const clientUrl = process.env.NODE_ENV === "development" ? "http://localhost:3000" : "https://app.zetsy.store";
+      const clientUrl =
+        process.env.NODE_ENV === "development"
+          ? "http://localhost:3000"
+          : "https://app.zetsy.store";
       const mailOptions = {
         from: "Zetsy Store <no-reply@zetsy.store>",
         to: email,
