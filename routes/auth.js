@@ -3,7 +3,6 @@ const express = require("express"),
     loginUser,
     registerUser,
     forgotPassword,
-    logoutUser,
     resetPassword,
     verifyUser,
   } = require("../controllers/auth");
@@ -14,8 +13,6 @@ const {
 const AuthenticationRouter = express.Router();
 
 AuthenticationRouter.post("/login", authenticationInputValidation, loginUser);
-
-AuthenticationRouter.post("/logout", logoutUser);
 
 AuthenticationRouter.post(
   "/register",

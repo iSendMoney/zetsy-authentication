@@ -205,12 +205,15 @@ module.exports = {
   verifyUser: async (req, res) => {
     try {
       const { token } = req.query;
+
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
       const user = await User.findById(decoded.userId);
-      if (!user) {
-        return res.status(404).json({ message: "User not found" });
-      }
+
+      if (!user) return res.status(404).json({ message: "User not found" });
+
       await User.findByIdAndUpdate(decoded.userId, { verified: true });
+
       res.status(200).send("User verified successfully!");
     } catch (err) {
       console.error(err);
