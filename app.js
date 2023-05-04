@@ -11,7 +11,7 @@ const { default: mongoose } = require("mongoose");
 const AuthenticationRouter = require("./routes/auth");
 const ProductRouter = require("./routes/product");
 const StoreRouter = require("./routes/store");
-require('dotenv').config()
+require("dotenv").config();
 const limiter = rateLimit({
   // @note need to determine how many request per minute might be there in our platform and thus set the limit
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -22,9 +22,11 @@ const limiter = rateLimit({
 app
   .use(express.json())
   .use(morgan("dev"))
-  .use(cors({
-    origin:"*"
-  }))
+  .use(
+    cors({
+      origin: "*",
+    })
+  )
   .use(limiter)
   .use(helmet())
   .use(hpp());
@@ -43,6 +45,7 @@ mongoose
   });
 
 app
+  .use("/", (req, res) => res.send("Hello"))
   .use("/protected", authenticateToken, (req, res) => {
     res.send("This route is protected!");
   })
