@@ -37,7 +37,7 @@ const sendVerificationMail = async (savedUser) => {
             <div style="background-color: #f8f8f8; padding: 20px;">
                 <h1>Welcome to Zetsy!</h1>
                 <p>Thank you for registering with us. Please click the link below to verify your account:</p>
-                <a href="https://zetsy-auth.herokuapp.com/api/v1/auth/verify-email?token=${verificationToken}" style="background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">Verify Account</a>
+                <a href="https://api.zetsy.store/api/v1/auth/verify-email?token=${verificationToken}" style="background-color: #4CAF50; border: none; color: white; padding: 15px 32px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; margin: 4px 2px; cursor: pointer;">Verify Account</a>
                 <p>If you did not sign up for this account, please ignore this email.</p>
             </div>
         </body>
@@ -88,9 +88,7 @@ module.exports = {
     try {
       const { email, password, picture } = req.body;
       const { social } = req.query;
-
       const existingUser = await User.findOne({ email });
-
       if (existingUser)
         return res.status(400).json({ message: "User already exists" });
 
