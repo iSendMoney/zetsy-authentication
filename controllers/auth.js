@@ -98,9 +98,7 @@ module.exports = {
       const newUser = new User({ email, password: hashedPassword, picture });
 
       const savedUser = await newUser.save();
-
-      if (social) {
-        const accessToken = jwt.sign(
+      const accessToken = jwt.sign(
           { userId: savedUser._id },
           process.env.JWT_SECRET,
           {
@@ -115,13 +113,7 @@ module.exports = {
         );
 
         res.status(200).json({ savedUser, accessToken, refreshToken });
-
         sendVerificationMail(savedUser);
-      } else {
-        res.status(200).json(savedUser);
-
-        sendVerificationMail(savedUser);
-      }
     } catch (err) {
       console.error(err);
       res.status(500).json({ message: "Server error" });
