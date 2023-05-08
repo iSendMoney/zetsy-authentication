@@ -9,7 +9,6 @@ const hpp = require("hpp");
 // const csurf = require("csurf");
 const { default: mongoose } = require("mongoose");
 const AuthenticationRouter = require("./routes/auth");
-const ProductRouter = require("./routes/product");
 const StoreRouter = require("./routes/store");
 require("dotenv").config();
 const limiter = rateLimit({
@@ -50,7 +49,6 @@ app
     res.send("This route is protected!");
   })
   .use("/api/v1/auth", AuthenticationRouter)
-  .use("/api/v1/product", ProductRouter)
   .use("/api/v1/store", StoreRouter)
   .use("*", (req, res) => {
     res.status(404).send("Not Found");

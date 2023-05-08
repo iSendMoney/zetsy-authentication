@@ -5,27 +5,16 @@ const express = require("express"),
     forgotPassword,
     resetPassword,
     verifyUser,
-  } = require("../controllers/auth");
-const {
-  authenticationInputValidation,
-} = require("../middlewares/inputValidation");
+  } = require("../controllers/auth"),
+  { authenticationInputValidation } = require("../middlewares/inputValidation");
 
 const AuthenticationRouter = express.Router();
 
-AuthenticationRouter.post("/login", authenticationInputValidation, loginUser);
-
-AuthenticationRouter.post(
-  "/register",
-  authenticationInputValidation,
-  registerUser
-);
-
-// POST /api/forgot-password
-AuthenticationRouter.post("/forgot-password", forgotPassword);
-
-// POST /api/reset-password
-AuthenticationRouter.post("/reset-password", resetPassword);
-
-AuthenticationRouter.get("/verify-email", verifyUser);
+// POST User Authentication
+AuthenticationRouter.post("/login", authenticationInputValidation, loginUser)
+  .post("/register", authenticationInputValidation, registerUser)
+  .post("/forgot-password", forgotPassword)
+  .post("/reset-password", resetPassword)
+  .get("/verify-email", verifyUser);
 
 module.exports = AuthenticationRouter;
