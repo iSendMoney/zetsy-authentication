@@ -1,5 +1,4 @@
-const mongoose = require("mongoose"),
-  Schema = mongoose.Schema;
+const mongoose = require("mongoose");
 
 const storeSchema = new mongoose.Schema({
   name: { type: String, unique: true, required: true },
@@ -13,7 +12,7 @@ const storeSchema = new mongoose.Schema({
   target_audience: { type: String, required: true },
   facebook: { type: String, required: true },
   instagram: { type: String, required: true },
-  // making twitter and linkedin social optional
+  // @note twitter and linkedin social are optional
   twitter: { type: String, required: false },
   linkedin: { type: String, required: false },
   owner: { type: mongoose.Schema.Types.ObjectId, required: true },
