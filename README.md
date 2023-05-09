@@ -1,5 +1,7 @@
 ## Authentication Microservice
 
+![image](https://github.com/Zetsy-Store/zetsy-authentication/assets/102910615/7a2e7cf5-ccc6-44d4-a05d-498a46886e8a)
+
 This is a Node.js microservice for handling user authentication in a web application. It provides endpoints for user registration, login, and logout, as well as protected routes that require a valid authentication token to access.
 
 ### Features
