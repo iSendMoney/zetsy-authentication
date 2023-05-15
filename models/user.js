@@ -6,7 +6,11 @@ const userSchema = new mongoose.Schema({
   refreshTokens: [{ type: String }],
   role: { type: String, default: "business" },
   verified: { type: Boolean, default: false },
-  picture:{type: String, default:"https://www.dropbox.com/s/iv3vsr5k6ib2pqx/avatar_default.jpg?dl=1"}
+  picture: {
+    type: String,
+    default:
+      "https://www.dropbox.com/s/iv3vsr5k6ib2pqx/avatar_default.jpg?dl=1",
+  },
 });
 
 module.exports = mongoose.model("User", userSchema);
